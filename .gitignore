@@ -1,0 +1,36 @@
+# Local environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Local working data downloaded from RCSB PDB
+work/
+raw/
+input/
+output/
+robustness_4DFR/runs/
+robustness_4DFR/logs/
+
+# Large or machine-specific artifacts
+*.tar.gz
+*.zip
+*.pse
+*.pt
+*.ckpt
+*.bin
+*.exe
+
+# Credentials and environment overrides
+.env
+.env.*
+*.pem
+*.key
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
