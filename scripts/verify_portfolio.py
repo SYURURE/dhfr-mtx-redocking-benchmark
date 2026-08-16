@@ -17,6 +17,15 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+EXCLUDED_DIRECTORY_NAMES = {".git", "__pycache__"}
+
+
+def is_package_file(path: Path) -> bool:
+    """Return True only for files that belong to the distributed package."""
+    if not path.is_file():
+        return False
+    relative = path.relative_to(ROOT)
+    return not any(part in EXCLUDED_DIRECTORY_NAMES for part in relative.parts)
 
 
 def require(path: str) -> Path:
@@ -56,7 +65,7 @@ def verify_manifest() -> None:
     actual_files = {
         path.relative_to(ROOT).as_posix()
         for path in ROOT.rglob("*")
-        if path.is_file() and path.resolve() != manifest.resolve()
+        if is_package_file(path) and path.resolve() != manifest.resolve()
     }
     if set(expected) != actual_files:
         missing = sorted(actual_files - set(expected))
@@ -135,6 +144,8 @@ def verify_png(path: str) -> None:
 def verify_markdown_links() -> None:
     pattern = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
     for markdown_path in ROOT.rglob("*.md"):
+        if not is_package_file(markdown_path):
+            continue
         text = markdown_path.read_text(encoding="utf-8")
         for target in pattern.findall(text):
             target = target.strip().split("#", 1)[0]
@@ -158,7 +169,7 @@ def verify_privacy() -> None:
         ".md", ".txt", ".csv", ".py", ".sh", ".pml", ".yml", ".yaml", ".log"
     }
     for path in ROOT.rglob("*"):
-        if not path.is_file() or path.suffix.lower() not in text_suffixes:
+        if not is_package_file(path) or path.suffix.lower() not in text_suffixes:
             continue
         if path.resolve() == Path(__file__).resolve():
             continue

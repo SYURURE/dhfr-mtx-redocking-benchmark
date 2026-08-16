@@ -35,3 +35,4 @@
 - package manifest、privacy、raw archive構造、固定入力hashの検査を強化
 - AIが実行した再現性検証の範囲、結果、限界を`AI_REPRODUCIBILITY_REVIEW.md`として公開記録
 - `AI_ASSISTANCE.md`のユーザー・AI役割分担を、実際の監査作業に合わせて更新
+- GitHub Actions checkoutで作成される`.git/`をpackage manifest検査から除外し、ローカルZIPとGitHub上で同じ検査対象になるよう修正
