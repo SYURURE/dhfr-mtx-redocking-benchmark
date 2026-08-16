@@ -1,0 +1,14 @@
+name: docking
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - smina
+  - openbabel
+  - rdkit
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - biopython
+  - jupyterlab

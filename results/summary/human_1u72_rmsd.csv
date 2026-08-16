@@ -1,0 +1,10 @@
+pose,smina_affinity_kcal_mol,symmetry_rmsd_A,matched_heavy_atoms,candidate_maps,full_heavy_atom_match,native_like_at_2A
+1,-11.50390,1.365,33,1,true,true
+2,-11.30071,1.421,33,1,true,true
+3,-10.49773,2.445,33,1,true,false
+4,-9.92592,1.853,33,1,true,true
+5,-9.68984,2.508,33,1,true,false
+6,-9.38103,9.728,33,1,true,false
+7,-9.28565,3.472,33,1,true,false
+8,-8.99991,9.223,33,1,true,false
+9,-8.69679,9.388,33,1,true,false
