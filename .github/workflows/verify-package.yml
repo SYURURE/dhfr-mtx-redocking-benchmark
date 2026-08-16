@@ -1,0 +1,38 @@
+name: Verify public package
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run offline consistency checks
+        run: python scripts/verify_portfolio.py
+
+      - name: Check Python syntax
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+
+          files = list(Path("scripts").rglob("*.py"))
+          for path in files:
+              ast.parse(path.read_text(encoding="utf-8-sig"), filename=str(path))
+          print(f"Python syntax OK: {len(files)} files")
+          PY
+
+      - name: Check shell syntax
+        run: bash -n scripts/docking/*.sh
