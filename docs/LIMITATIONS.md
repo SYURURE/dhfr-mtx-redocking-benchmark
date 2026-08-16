@@ -31,6 +31,13 @@
 - CNNがこの1 runを救済したことは示せるが、一般的な優越性は示せない。
 - 次段階では複数seedの全ポーズへ展開し、run単位のTop 1救済率を推定する必要がある。
 
+## Computational reproducibility
+
+- 4DFRと1U72の保存済みSMINA SDFは、Linux x86-64/WSL2、固定入力、固定seed、CPU 2 threads、公開Conda buildでSHA-256完全一致を確認した。
+- 別OS、別CPU architecture、別compiler/build、別thread数でもビット単位で一致するとは限らない。
+- GNINA POCは入力と全raw出力を保存しているが、異なるBLAS/CUDA/cuDNN/CPU buildで再採点した場合のテキスト完全一致は保証しない。
+- PNGはmatplotlibやfont buildでバイト列が変わるため、画像hashではなく元CSV、軸、ラベル、主要統計を再現性の中心とする。
+
 ## Appropriate claims
 
 このプロジェクトから主張できるのは次の範囲です。
@@ -45,4 +52,3 @@
 - ドッキングスコアから実測活性や選択性を予測できた。
 - GNINAが常にSMINAより優れる。
 - ヒトDHFRの方が*E. coli* DHFRより本質的にドッキングしやすい。
-

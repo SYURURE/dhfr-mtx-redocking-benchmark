@@ -102,15 +102,14 @@ def make_atom_maps(
     if not probe_matches or not reference_matches:
         raise RuntimeError("原子対応候補がありません")
 
-    atom_maps: list[list[tuple[int, int]]] = []
+    unique_maps: dict[tuple[tuple[int, int], ...], None] = {}
 
     for probe_match in probe_matches:
         for reference_match in reference_matches:
-            atom_maps.append(
-                list(zip(probe_match, reference_match))
-            )
+            mapping = tuple(zip(probe_match, reference_match))
+            unique_maps[mapping] = None
 
-    return atom_maps, mcs.numAtoms
+    return [list(mapping) for mapping in unique_maps], mcs.numAtoms
 
 
 def calculate_symmetry_rmsd(

@@ -1,0 +1,55 @@
+name: Reproduce core docking
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce-single-runs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Create pinned docking environment
+        uses: mamba-org/setup-micromamba@v3
+        with:
+          environment-file: environment/environment_docking.yml
+          cache-environment: true
+          cache-downloads: true
+          post-cleanup: all
+
+      - name: Verify fixed inputs
+        run: |
+          cd data/reference
+          sha256sum -c SHA256SUMS
+
+      - name: Reproduce historical 4DFR run
+        run: bash scripts/docking/run_4dfr_redocking.sh work/reproduction/4dfr
+
+      - name: Reproduce Human 1U72 run
+        run: bash scripts/docking/run_human_1u72_redocking.sh work/reproduction/human_1u72
+
+      - name: Compare generated SDF files with preserved results
+        run: |
+          echo "0400881cbd88cd714848e05aee634af6d45073536bc58215ae0f383777558f2f  work/reproduction/4dfr/results/MTX_redocked.sdf" | sha256sum -c -
+          echo "50fa9f6d6fa8d390db7e3bc22e2948282737e084acdd0180c4497dbfd7d2ea2c  work/reproduction/human_1u72/results/1U72_MTX_redocked.sdf" | sha256sum -c -
+          cmp work/reproduction/4dfr/results/MTX_redocked.sdf results/poses/4dfr_mtx_redocked_historical.sdf
+          cmp work/reproduction/human_1u72/results/1U72_MTX_redocked.sdf results/poses/1u72_mtx_redocked.sdf
+
+      - name: Upload reproduction logs and metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: dhfr-core-reproduction-evidence
+          path: |
+            work/reproduction/4dfr/results/
+            work/reproduction/4dfr/metadata/
+            work/reproduction/human_1u72/results/
+            work/reproduction/human_1u72/metadata/
+          if-no-files-found: error

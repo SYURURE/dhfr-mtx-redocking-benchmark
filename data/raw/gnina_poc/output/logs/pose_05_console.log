@@ -1,0 +1,22 @@
+              _             
+             (_)            
+   __ _ _ __  _ _ __   __ _ 
+  / _` | '_ \| | '_ \ / _` |
+ | (_| | | | | | | | | (_| |
+  \__, |_| |_|_|_| |_|\__,_|
+   __/ |                    
+  |___/                     
+
+gnina v1.3.3 master:6fe1ce2   Built Jun 30 2026.
+gnina is based on smina and AutoDock Vina.
+Please cite appropriately.
+
+Commandline: gnina --receptor input/4DFR_chainA_raw.pdb --ligand input/poses/pose_05.sdf --score_only --cnn_scoring rescore --no_gpu --cpu 6 --out output/poses/pose_05_gnina.sdf --log output/logs/pose_05.log
+## Name gauss(o=0,_w=0.5,_c=8) gauss(o=3,_w=2,_c=8) repulsion(o=0,_c=8) hydrophobic(g=0.5,_b=1.5,_c=8) non_dir_h_bond(g=-0.7,_b=0,_c=8) num_tors_div
+Affinity: -8.28375 (kcal/mol)
+CNNscore: 0.01243 
+CNNaffinity: 4.93127
+CNNvariance: 0.60604
+Intramolecular energy: -1.48861
+Term values, before weighting:
+## MTX 87.77222 1628.86719 2.32333 42.46225 2.69633 0.00000

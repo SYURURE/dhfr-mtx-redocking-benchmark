@@ -4,6 +4,8 @@
 
 DHFR–methotrexate（MTX）を題材に、単発の再ドッキングから始め、ヒトDHFRとの比較、60 runsの頑健性評価、固定ポーズのGNINA CNN再スコアリングまで段階的に検証した教育用ポートフォリオです。
 
+2026-08-16にOpenAI Codexを用いたAI支援再現性レビューを行い、主要計算の再実行、raw evidenceからの再解析、ハッシュ照合、ZIP再展開後の検査まで実施しました。範囲、結果、限界は[AI-assisted reproducibility review](AI_REPRODUCIBILITY_REVIEW.md)に記録しています。この確認は人間の査読、第三者認証、規制上のvalidationではありません。
+
 このプロジェクトの中心は「ドッキングが動いたか」ではなく、次の2つを分離して評価した点にあります。
 
 - **探索**：結晶構造に近いnative-like poseを候補内へ生成できたか
@@ -14,7 +16,7 @@ DHFR–methotrexate（MTX）を題材に、単発の再ドッキングから始�
 | Study | Scale | Top result | Interpretation |
 |---|---:|---|---|
 | *E. coli* DHFR 4DFR exploratory redocking | 5 poses | Best RMSD 1.516 Å at Pose 3; Pose 1 RMSD 6.100 Å | 探索は成功、Top 1順位付けは失敗 |
-| Human DHFR 1U72 redocking | 9 poses | Pose 1: RMSD 1.365 Å, SMINA affinity −11.5 kcal/mol | 探索とTop 1順位付けの両方に成功 |
+| Human DHFR 1U72 redocking | 9 poses | Pose 1: symmetry-aware RMSD 1.092 Å, SMINA affinity −11.5 kcal/mol | 探索とTop 1順位付けの両方に成功 |
 | 4DFR robustness analysis | 20 seeds × 3 exhaustiveness = 60 runs | Top 1: 0/60; Top N: 60/60 | 候補生成は頑健だが誤Top 1も頑健 |
 | GNINA proof-of-concept rescoring | 1 run, 9 fixed poses | CNNscore selected Pose 2, RMSD 1.422 Å | 同一候補集合でCNNがnative-like poseを1位へ救済 |
 
@@ -32,7 +34,7 @@ DHFR–methotrexate（MTX）を題材に、単発の再ドッキングから始�
 
 ### 2. Human 1U72: Top 1と最良構造が一致した
 
-ヒトDHFR–NADPH–MTX三者複合体1U72では、9ポーズ中3ポーズが2 Å以内でした。Pose 1はSMINA affinityが最良で、結晶MTXとの固定座標・対称性考慮重原子RMSDも最小でした。
+ヒトDHFR–NADPH–MTX三者複合体1U72では、9ポーズ中3ポーズが2 Å以内でした。Pose 1はSMINA affinityが最良で、4通りの等価原子mappingから最小値を採った固定座標・対称性考慮重原子RMSDも最小でした。
 
 ![Human 1U72 RMSD by pose](results/figures/human_1u72/human_1u72_rmsd_by_pose.png)
 
@@ -76,25 +78,31 @@ SMINAが生成した座標を動かさず、GNINA 1.3.3 CPU版のCNNで再採点
 
 - **Docking**: SMINA 2020.12.10（AutoDock Vina 1.1.2ベース）
 - **Rescoring**: GNINA 1.3.3、固定ポーズ、`--score_only --cnn_scoring rescore --no_gpu`
+- **GNINA runtime**: CUDA 12.8 / cuDNN 9.10.2.21のYAMLとLinux x86-64完全lockを収録
 - **Structures**: RCSB PDB `4DFR`、`1U72`、ligand `MTX`
 - **Ligand preparation**: Open Babelによる教育用pH 7.4処理と3D生成
 - **RMSD**: RDKit `CalcRMS`、座標を再アラインしない、重原子、対称性考慮
 - **Success threshold**: RMSD ≤ 2.0 Å
 - **Visualization**: PyMOL、pandas、matplotlib
 
-詳細は[Methods](docs/METHODS.md)、[Results](docs/RESULTS.md)、[Reproducibility](docs/REPRODUCIBILITY.md)、[Limitations](docs/LIMITATIONS.md)を参照してください。
+詳細は[Methods](docs/METHODS.md)、[Results](docs/RESULTS.md)、[Reproducibility](docs/REPRODUCIBILITY.md)、[Independent validation](docs/VALIDATION.md)、[Limitations](docs/LIMITATIONS.md)を参照してください。
 
-GitHubへの初回登録は[日本語のアップロード手順](docs/GITHUB_UPLOAD_GUIDE_JP.md)にまとめています。
+GitHubへの初回登録と既存レポジトリへの修正版反映は[日本語のアップロード手順](docs/GITHUB_UPLOAD_GUIDE_JP.md)にまとめています。
+監査後の修正内容は[Changelog](CHANGELOG.md)にまとめています。
 
 ## Repository layout
 
 ```text
 .
 ├─ environment/              # Conda環境定義
+├─ data/
+│  ├─ reference/            # hash固定したPDB/SDF入力
+│  └─ raw/                  # robustness 60 runsとGNINA POCのraw evidence
 ├─ scripts/
 │  ├─ docking/               # 4DFR、1U72、robustness、GNINA
 │  ├─ analysis/              # RMSD・集計
 │  ├─ visualization/         # PyMOL・グラフ
+│  ├─ tests/                 # RDKitを使う科学計算回帰テスト
 │  └─ verify_portfolio.py    # 公開パッケージのオフライン整合検査
 ├─ results/
 │  ├─ poses/                 # 保存済みSMINAポーズ
@@ -104,6 +112,7 @@ GitHubへの初回登録は[日本語のアップロード手順](docs/GITHUB_UP
 ├─ docs/                     # 方法、結果、再現性、限界
 ├─ .github/workflows/        # GitHub上の自動整合検査
 ├─ AI_ASSISTANCE.md
+├─ AI_REPRODUCIBILITY_REVIEW.md
 ├─ THIRD_PARTY_NOTICES.md
 └─ LICENSE.md
 ```
@@ -116,16 +125,22 @@ Python標準ライブラリだけで、公開ZIPの構造、SDFレコード数�
 python scripts/verify_portfolio.py
 ```
 
-この検査はSMINA、GNINA、RDKitの科学計算を再実行するものではありません。
-GitHubへ登録すると、同じ検査とPython/Bash構文検査がGitHub Actionsでも自動実行されます。
+この軽量検査はSMINA、GNINA、RDKitの科学計算を再実行するものではありません。GitHub Actionsではこれに加え、RDKitによる4DFR・1U72 RMSD、raw 60-run archiveからのrobustness集計、raw GNINA出力からの比較CSVを実際に再計算する科学計算回帰テストも実行します。
 
 ## Reproduce the docking workflows
 
-LinuxまたはWSL2で実行します。RCSB PDBから入力構造を取得するため、ネットワーク接続が必要です。
+LinuxまたはWSL2で実行します。既定では`data/reference/`のhash固定入力を使うため、入力取得のネットワーク接続は不要です。
 
 ```bash
 mamba env create -f environment/environment_docking.yml
 conda activate docking
+```
+
+Linux x86-64で監査時と同じpackage buildを使う場合は、完全lockも利用できます。
+
+```bash
+conda create --name docking-locked --file environment/docking-linux-64-explicit.txt
+conda activate docking-locked
 ```
 
 4DFR:
@@ -146,12 +161,14 @@ RMSD解析:
 mamba env create -f environment/environment_analysis.yml
 conda activate analysis
 python scripts/analysis/calculate_symmetry_rmsd.py \
-  --crystal path/to/crystal_mtx.sdf \
-  --docked path/to/redocked.sdf \
+  --crystal data/reference/1U72_MTX_crystal_historical.sdf \
+  --docked results/poses/1u72_mtx_redocked.sdf \
   --csv symmetry_rmsd_results.csv
 ```
 
-Robustness解析とGNINA再スコアリングには、所定の作業ディレクトリ構造が必要です。具体的な順序は[Reproducibility](docs/REPRODUCIBILITY.md)に記載しています。GNINAバイナリは同梱していません。
+RCSBから現在の入力を再取得して比較する場合のみ、`INPUT_MODE=download`を指定します。RCSBサービス側のSDF表現が変化するとhistorical RMSDは完全一致しない可能性があります。
+
+RobustnessとGNINAについては、集計前のraw evidenceも`data/raw/`に収録しました。具体的な再生成手順は[Reproducibility](docs/REPRODUCIBILITY.md)に記載しています。GNINAバイナリ自体は同梱していません。
 
 ## What this project demonstrates
 
@@ -168,11 +185,11 @@ Robustness解析とGNINA再スコアリングには、所定の作業ディレ�
 
 ## AI-assisted development
 
-コード、文書、公開用構成の作成にはAI支援を利用しました。テーマ選定、環境構築、計算実行、出力確認、エラー対応、結果の評価、限界の判断はユーザーが担当しました。詳細は[AI_ASSISTANCE.md](AI_ASSISTANCE.md)を参照してください。
+コード、文書、公開用構成にはAI支援を利用しました。当初の実習の計算と証拠保存はユーザーが行い、公開版の技術監査ではAIも主要計算の再実行、raw evidenceの再解析、整合修正、検査を行いました。役割分担は[AI_ASSISTANCE.md](AI_ASSISTANCE.md)、実施した検証は[AI_REPRODUCIBILITY_REVIEW.md](AI_REPRODUCIBILITY_REVIEW.md)を参照してください。
 
 ## Data, software, and license
 
-RCSB PDBのraw構造やSMINA/GNINAなどのバイナリは同梱していません。取得元、引用、第三者ライセンスは[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)にまとめています。
+再現性固定用のRCSB PDB/SDF snapshot、60-run raw archive、GNINA POCの入出力を同梱しています。RCSB PDB archive/API dataはCC0 1.0で、構造著者とRCSB PDBへの帰属情報を[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)にまとめています。SMINA/GNINAなどの実行バイナリは同梱していません。
 
 この公開準備版はポートフォリオレビュー用で、再利用許諾はまだ付与していません。[LICENSE.md](LICENSE.md)を参照してください。
 

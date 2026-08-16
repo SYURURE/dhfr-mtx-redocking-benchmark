@@ -2,10 +2,10 @@ name: analysis
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
-  - rdkit
-  - numpy
-  - pandas
-  - scipy
-  - matplotlib
-  - jupyterlab
+  - python=3.11.15
+  - rdkit=2023.09.6
+  - numpy=1.26.4
+  - pandas=3.0.5
+  - scipy=1.17.1
+  - matplotlib=3.10.9
+  - jupyterlab=4.6.3

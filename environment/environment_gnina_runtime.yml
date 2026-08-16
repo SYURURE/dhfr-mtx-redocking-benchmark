@@ -1,0 +1,7 @@
+name: gnina-runtime
+channels:
+  - conda-forge
+dependencies:
+  - cuda-version=12.8
+  - cuda-libraries=12.8.2
+  - libcudnn=9.10.2.21

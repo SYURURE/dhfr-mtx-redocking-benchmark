@@ -4,7 +4,7 @@
 
 ## `poses/`
 
-- `4dfr_mtx_redocked_historical.sdf`: 4DFRの初回探索で得た5ポーズ。初回コマンドではseedを明示指定していませんが、SMINAログには実行時seedが記録されています。
+- `4dfr_mtx_redocked_historical.sdf`: 4DFRの初回探索で得た5ポーズ。SMINAログから復元したseed `-1408967744`を公開スクリプトの既定値として固定しています。
 - `1u72_mtx_redocked.sdf`: seed `20260719`、exhaustiveness `16`、最大9ポーズで得たヒトDHFR 1U72の結果。
 
 ## `logs/`
@@ -25,4 +25,4 @@
 
 ## Raw data policy
 
-60 runs分の全SDF・ログとGNINAの全raw logは、公開ZIPを読みやすく保つため収録していません。再計算スクリプトと集計CSVは収録しています。元のraw archiveはローカルで保管されています。
+60 runs分の全SDF・ログは`data/raw/robustness/4DFR_robustness_results.tar.gz`に収録しています。GNINA POCの正確な9-pose入力、分割入力、採点済みSDF、全ログは`data/raw/gnina_poc/`に収録しています。内容とSHA-256は[`data/README.md`](../data/README.md)を参照してください。

@@ -11,13 +11,13 @@
 
 ## Structural inputs
 
-構造はRCSB PDBから取得します。
+構造はRCSB PDBから取得し、再現性監査時に使用したsnapshotを`data/reference/`へhash固定して収録しています。
 
 - `4DFR`: *E. coli* DHFR–MTX
 - `1U72`: human DHFR–NADPH–MTX
 - `MTX`: RCSB Chemical Componentのideal SDFおよび各PDB entryのinstance SDF
 
-Raw PDB/SDFはリポジトリに固定保存せず、実行スクリプトが公式URLから取得します。
+実行スクリプトは既定で固定snapshotを使います。`INPUT_MODE=download`を指定した場合のみ公式URLから現在の入力を取得します。固定入力のSHA-256は`data/reference/SHA256SUMS`に記録しています。
 
 ## Receptor preparation
 
@@ -47,7 +47,8 @@ RCSBのMTX ideal SDFをOpen Babelへ入力し、`-p 7.4 --gen3d`で教育用の3
 - `autobox_add`: 5 Å
 - exhaustiveness: 8
 - modes: 5
-- 初回コマンドではseedを事前固定せず、実行時seedをログに保存
+- historical実行時seed: `-1408967744`（保存ログから復元し、公開スクリプトの既定値として固定）
+- 再現用既定CPU threads: 2
 
 ### Human 1U72
 
@@ -56,6 +57,7 @@ RCSBのMTX ideal SDFをOpen Babelへ入力し、`-p 7.4 --gen3d`で教育用の3
 - exhaustiveness: 16
 - modes: 9
 - seed: 20260719
+- 再現用既定CPU threads: 2
 - receptor: human DHFR Chain A + NADPH (`NDP`)
 
 ### 4DFR robustness study
@@ -74,10 +76,12 @@ Redocking評価では、予測リガンドを結晶リガンドへ再アライ�
 
 1. 明示的水素を除去
 2. 分子キャッシュと環情報を初期化
-3. 最大共通部分構造から原子対応候補を列挙
-4. カルボキシラートなどの等価原子を考慮
-5. 固定座標の重原子RMSDを計算
+3. 最大共通部分構造から、重複を除いた原子対応候補を列挙
+4. カルボキシラートなどの等価原子mappingをすべてRDKit `CalcRMS`へ渡す
+5. 候補mapping間の最小固定座標重原子RMSDを採用
 6. 33重原子すべてが対応していることを確認
+
+このmapping policyを4DFR、1U72、robustness、GNINA POCで統一しています。保存CSVの`candidate_maps`は公開コードが実際に評価した重複除去後のmapping数です。
 
 判定目安はRMSD ≤ 2.0 Åとしました。
 
@@ -102,4 +106,3 @@ SMINA生成済みの9ポーズを個別SDFへ分割し、座標を動かさず�
 ```
 
 比較した指標はSMINA affinity、GNINA empirical score、CNNscore、CNNaffinity、CNNvariance、結晶MTXとのRMSDです。CNNscore/CNNaffinityは大きい方、affinity/RMSDは小さい方を上位としました。
-

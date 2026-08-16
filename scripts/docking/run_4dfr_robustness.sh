@@ -24,9 +24,9 @@ SEED_END="${SEED_END:-20}"
 read -r -a EXHAUSTIVENESS_ARRAY <<< "${EXHAUSTIVENESS_VALUES:-8 16 32}"
 NUM_MODES="${NUM_MODES:-9}"
 AUTOBOX_ADD="${AUTOBOX_ADD:-4}"
-CPU="${CPU:-$(nproc)}"
+CPU="${CPU:-2}"
 
-for cmd in smina seq date; do
+for cmd in date seq sha256sum smina; do
   command -v "$cmd" >/dev/null 2>&1 || {
     echo "ERROR: required command not found: $cmd" >&2
     exit 1
@@ -47,6 +47,25 @@ fi
 
 mkdir -p "$RUN_DIR" "$LOG_DIR"
 echo "seed,exhaustiveness,elapsed_seconds,status,output_file,log_file" > "$SUMMARY"
+
+{
+  echo "Run date (UTC): $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  echo "Operating system: $(uname -a)"
+  echo "Seed range: $SEED_START-$SEED_END"
+  echo "Exhaustiveness values: ${EXHAUSTIVENESS_ARRAY[*]}"
+  echo "Requested modes: $NUM_MODES"
+  echo "Autobox add: $AUTOBOX_ADD"
+  echo "CPU: $CPU"
+  echo
+  echo "SMINA:"
+  smina --version 2>&1 || true
+  echo
+  echo "SMINA binary SHA-256:"
+  sha256sum "$(command -v smina)" 2>&1 || true
+  echo
+  echo "Input SHA-256:"
+  sha256sum "$RECEPTOR" "$LIGAND" "$CRYSTAL"
+} > "$OUTPUT_ROOT/versions_parameters_and_inputs.txt"
 
 total_runs=$(( (SEED_END - SEED_START + 1) * ${#EXHAUSTIVENESS_ARRAY[@]} ))
 current_run=0

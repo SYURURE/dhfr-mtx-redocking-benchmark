@@ -7,5 +7,13 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.sdf text eol=lf
+*.pdb text eol=lf
+*.log text eol=lf
+*.txt text eol=lf
 *.pml text eol=lf
 *.png binary
+*.tar.gz binary
+
+# These preserved/generated CSV fixtures intentionally use RFC 4180 CRLF.
+results/summary/4dfr_robustness_results.csv -text
+data/raw/gnina_poc/input/pose_manifest.csv -text

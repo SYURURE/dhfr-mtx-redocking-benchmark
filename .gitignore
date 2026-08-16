@@ -6,13 +6,13 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 
-# Local working data downloaded from RCSB PDB
-work/
-raw/
-input/
-output/
-robustness_4DFR/runs/
-robustness_4DFR/logs/
+# Root-level local working data. Versioned fixtures under data/ are retained.
+/work/
+/raw/
+/input/
+/output/
+/robustness_4DFR/runs/
+/robustness_4DFR/logs/
 
 # Large or machine-specific artifacts
 *.tar.gz
@@ -22,6 +22,9 @@ robustness_4DFR/logs/
 *.ckpt
 *.bin
 *.exe
+
+# Reproducibility evidence intentionally versioned in this repository.
+!data/raw/robustness/4DFR_robustness_results.tar.gz
 
 # Credentials and environment overrides
 .env

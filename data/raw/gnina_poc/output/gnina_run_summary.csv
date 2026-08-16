@@ -1,0 +1,10 @@
+pose,elapsed_seconds,status,input_file,output_file
+01,2,success,input/poses/pose_01.sdf,output/poses/pose_01_gnina.sdf
+02,1,success,input/poses/pose_02.sdf,output/poses/pose_02_gnina.sdf
+03,2,success,input/poses/pose_03.sdf,output/poses/pose_03_gnina.sdf
+04,2,success,input/poses/pose_04.sdf,output/poses/pose_04_gnina.sdf
+05,1,success,input/poses/pose_05.sdf,output/poses/pose_05_gnina.sdf
+06,2,success,input/poses/pose_06.sdf,output/poses/pose_06_gnina.sdf
+07,2,success,input/poses/pose_07.sdf,output/poses/pose_07_gnina.sdf
+08,2,success,input/poses/pose_08.sdf,output/poses/pose_08_gnina.sdf
+09,1,success,input/poses/pose_09.sdf,output/poses/pose_09_gnina.sdf

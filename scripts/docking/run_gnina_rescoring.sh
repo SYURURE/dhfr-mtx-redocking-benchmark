@@ -11,11 +11,12 @@ OUTPUT_DIRECTORY="output/poses"
 LOG_DIRECTORY="output/logs"
 SUMMARY_FILE="output/gnina_run_summary.csv"
 
-CPU_THREADS="${CPU_THREADS:-4}"
+CPU_THREADS="${CPU_THREADS:-6}"
 
 mkdir -p \
   "$OUTPUT_DIRECTORY" \
-  "$LOG_DIRECTORY"
+  "$LOG_DIRECTORY" \
+  "output/metadata"
 
 if [[ ! -f "$RECEPTOR" ]]; then
     echo "ERROR: receptorがありません: $RECEPTOR" >&2
@@ -27,11 +28,40 @@ if ! command -v "$GNINA_BIN" >/dev/null 2>&1; then
     exit 1
 fi
 
+for required_command in date sha256sum; do
+    if ! command -v "$required_command" >/dev/null 2>&1; then
+        echo "ERROR: required command not found: $required_command" >&2
+        exit 1
+    fi
+done
+
+shopt -s nullglob
+pose_files=("$POSE_DIRECTORY"/pose_*.sdf)
+if (( ${#pose_files[@]} == 0 )); then
+    echo "ERROR: input poseがありません: $POSE_DIRECTORY" >&2
+    exit 1
+fi
+
+{
+    echo "Run date (UTC): $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    echo "Operating system: $(uname -a)"
+    echo "CPU threads: $CPU_THREADS"
+    echo
+    echo "GNINA:"
+    "$GNINA_BIN" --version 2>&1 || true
+    echo
+    echo "GNINA binary SHA-256:"
+    sha256sum "$(command -v "$GNINA_BIN")" 2>&1 || true
+    echo
+    echo "Input SHA-256:"
+    sha256sum "$RECEPTOR" "$POSE_DIRECTORY"/pose_*.sdf
+} > "output/metadata/versions_parameters_and_inputs.txt"
+
 echo \
 "pose,elapsed_seconds,status,input_file,output_file" \
 > "$SUMMARY_FILE"
 
-for pose_file in "$POSE_DIRECTORY"/pose_*.sdf; do
+for pose_file in "${pose_files[@]}"; do
     filename=$(basename "$pose_file")
     pose_id="${filename#pose_}"
     pose_id="${pose_id%.sdf}"

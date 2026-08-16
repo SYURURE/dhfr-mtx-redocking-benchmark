@@ -118,25 +118,30 @@ def generate_atom_maps(
         )
     )
 
-    atom_maps = []
+    unique_maps: dict[
+        tuple[tuple[int, int], ...],
+        None,
+    ] = {}
 
     for probe_match in probe_matches:
         for reference_match in reference_matches:
-            atom_maps.append(
-                list(
-                    zip(
-                        probe_match,
-                        reference_match,
-                    )
+            mapping = tuple(
+                zip(
+                    probe_match,
+                    reference_match,
                 )
             )
+            unique_maps[mapping] = None
 
-    if not atom_maps:
+    if not unique_maps:
         raise RuntimeError(
             "原子対応候補がありません"
         )
 
-    return atom_maps
+    return [
+        list(mapping)
+        for mapping in unique_maps
+    ]
 
 
 def calculate_rmsd(

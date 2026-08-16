@@ -2,5 +2,5 @@ name: pymol
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
-  - pymol-open-source
+  - python=3.11.15
+  - pymol-open-source=3.1.0
